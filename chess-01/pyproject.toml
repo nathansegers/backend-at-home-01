@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "chess-01"
+version = "0.1.0"
+description = ""
+authors = ["Nathan Segers <nathan_segers@hotmail.com>"]
+readme = "README.md"
+packages = [{include = "chess_01"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
