@@ -1,6 +1,7 @@
-from pieces import Pawn, Rook, Knight, Bishop, King, Queen
+import json
+from pieces import Pawn, Rook, Knight, Bishop, King, Queen, BaseChessPiece
 # The Chess board is a 8x8 grid of squares
-class Board():
+class Board(dict):
     """
     The Chess Board that will be used to play the game.
     It has an setup_board() function that fills a dictionary of squares with the pieces that are in the starting position.
@@ -17,6 +18,13 @@ class Board():
         # Those represent the rows and columns of the chess board
         self.squares = {f'{chr(x)}{y}': None for x in range(ord('a'), ord('i')) for y in range(1, 9)}
         self.setup_board()
+
+        for square, piece in self.squares.items():
+            if piece is not None:
+                piece.set_initial_position(square)
+                piece.define_board(self)
+
+        dict.__init__(self, squares=self.squares)
     
     def setup_board(self):
         """
@@ -54,9 +62,17 @@ class Board():
         self.squares['h8'] = Rook('WHITE', 2)
 
     def print_board(self):
-        # First row
         rows = [
             [self.squares[key] for key in self.squares.keys() if key.endswith(f"{i}")] for i in range(1,9)
+        ]
+        # Print the rows on different lines in the console
+        for row in rows:
+            print(row)
+
+    @staticmethod
+    def print_saved_board(board):
+        rows = [
+            [board[key] for key in board.keys() if key.endswith(f"{i}")] for i in range(1,9)
         ]
         # Print the rows on different lines in the console
         for row in rows:
@@ -68,7 +84,7 @@ class Board():
         """
         # Search the dictionary values on the symbol, identifier and color properties of the pieces.
         # Return the piece that matches the symbol, identifier and color.
-        return {key: value for key, value in self.squares.items() if value.symbol == symbol and value.identifier == identifier and value.color == color}
+        return [value for value in [value for value in self.squares.values() if value is not None] if value.symbol == symbol and value.identifier == identifier and value.color == color][0]
 
     def get_piece(self, square):
         """Returns the piece that is on a specific square"""
@@ -81,10 +97,22 @@ class Board():
     def kill_piece(self, square):
         """Kills a piece by setting is_alive to False"""
         piece = self.get_piece(square)
-        piece.is_alive = False
+        piece.die()
         print(f"{piece} was killed.")
 
     def save_board(self):
         """Saves the board to a file"""
-        with open('board.txt', 'w') as file:
-            file.write(str(self.squares))
+        saved_file = 'board.txt'
+        with open(saved_file, 'a') as file:
+            file.write(json.dumps(self.squares))
+            file.write('\n')
+        print(f"Saved board to txt file: {saved_file}.")
+        return saved_file
+
+    @staticmethod
+    def get_board_movements():
+        """Gets the movements from that board.txt file using a generator"""
+        saved_file = 'board.txt'
+        with open(saved_file, 'r') as file:
+            for line in file:
+                yield json.loads(line)
