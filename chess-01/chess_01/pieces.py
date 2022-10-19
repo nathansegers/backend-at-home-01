@@ -3,7 +3,7 @@ import functools
 import json
 
 
-class BoardMovements(ABC):
+class BoardMovements():
 
     @staticmethod
     def forward(position: str, color: str, squares: int):
@@ -108,7 +108,7 @@ class BaseChessPiece(ABC, dict):
         self.name = name # The name to use for the Piece
         self.identifier = identifier # The identifier to use for the Piece in case there are more with the same name
         self.is_alive = True
-        self.position = "DEFAULT"
+        self.position = "None"
         dict.__init__(self, color=color, symbol=symbol, identifier=identifier, is_alive=self.is_alive, name=self.name)
 
 
